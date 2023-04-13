@@ -28,8 +28,8 @@ namespace ContosoUniversity
             )
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "LastName_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "EnrollmentDate" ? "EnrollmentDate_desc" : "EnrollmentDate";
 
             if(searchString != null)
             {
@@ -51,6 +51,31 @@ namespace ContosoUniversity
                                        || s.FirstMidName.Contains(searchString));
             }
 
+            if (string.IsNullOrEmpty(sortOrder))
+            {
+                sortOrder = "LastName";
+            }
+
+            bool descending = false;
+            if (sortOrder.EndsWith("_desc"))
+            {
+                sortOrder = sortOrder.Substring(0, sortOrder.Length - 5);
+                descending = true;
+            }
+
+            if (descending)
+            {
+                students = students.OrderByDescending(e => EF.Property<object>(e, sortOrder));
+            }
+            else
+            {
+                students = students.OrderBy(e => EF.Property<object>(e, sortOrder));
+            }
+
+            int pageSize = 3;
+            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(),
+                pageNumber ?? 1, pageSize));
+            /*
             switch (sortOrder)
             {
                 case "name_desc":
@@ -70,6 +95,7 @@ namespace ContosoUniversity
             int pageSize = 3;
 
             return View(await students.AsNoTracking().ToListAsync());
+            */
         }
 
         // GET: Students/Details/5

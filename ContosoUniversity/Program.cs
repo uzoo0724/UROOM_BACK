@@ -1,6 +1,7 @@
 using ContosoUniversity.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
+using System.Data.SqlClient;
 
 namespace ContosoUniversity
 {
