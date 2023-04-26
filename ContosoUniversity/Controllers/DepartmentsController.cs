@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 
-namespace ContosoUniversity
+namespace ContosoUniversity.Controllers
 {
     public class DepartmentsController : Controller
     {
@@ -29,7 +29,7 @@ namespace ContosoUniversity
         // GET: Departments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Departments == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -42,6 +42,7 @@ namespace ContosoUniversity
                 .Include(d => d.Administrator)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
+
             if (department == null)
             {
                 return NotFound();
@@ -77,7 +78,7 @@ namespace ContosoUniversity
         // GET: Departments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Departments == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -233,7 +234,7 @@ namespace ContosoUniversity
 
         private bool DepartmentExists(int id)
         {
-          return (_context.Departments?.Any(e => e.DepartmentID == id)).GetValueOrDefault();
+            return _context.Departments.Any(e => e.DepartmentID == id);
         }
     }
 }

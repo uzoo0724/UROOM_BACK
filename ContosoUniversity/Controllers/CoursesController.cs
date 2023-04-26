@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 
-namespace ContosoUniversity
+namespace ContosoUniversity.Controllers
 {
     public class CoursesController : Controller
     {
@@ -34,7 +34,7 @@ namespace ContosoUniversity
         // GET: Courses/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Courses == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -80,7 +80,7 @@ namespace ContosoUniversity
             }
             //ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "DepartmentID", course.DepartmentID);
             PopulateDepartmentsDropDownList(course.DepartmentID);
-            
+
             return View(course);
         }
 
@@ -101,7 +101,7 @@ namespace ContosoUniversity
             }
             //ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "DepartmentID", course.DepartmentID);
             PopulateDepartmentsDropDownList(course.DepartmentID);
-            
+
             return View(course);
         }
 
@@ -128,6 +128,7 @@ namespace ContosoUniversity
                 try
                 {
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException /* ex */)
                 {
@@ -136,7 +137,6 @@ namespace ContosoUniversity
                         "Try again, and if the problem persists, " +
                         "see your system administrator.");
                 }
-                return RedirectToAction(nameof(Index));
             }
             PopulateDepartmentsDropDownList(courseToUpdate.DepartmentID);
             return View(courseToUpdate);
@@ -187,7 +187,7 @@ namespace ContosoUniversity
         // GET: Courses/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Courses == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -209,29 +209,18 @@ namespace ContosoUniversity
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Courses == null)
-            {
-                return Problem("Entity set 'SchoolContext.Courses'  is null.");
-            }
             var course = await _context.Courses.FindAsync(id);
-            if (course != null)
-            {
-                _context.Courses.Remove(course);
-            }
-            
+            _context.Courses.Remove(course);
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CourseExists(int id)
-        {
-          return (_context.Courses?.Any(e => e.CourseID == id)).GetValueOrDefault();
         }
 
         public IActionResult UpdateCourseCredits()
         {
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateCourseCredits(int? multiplier)
@@ -245,6 +234,11 @@ namespace ContosoUniversity
                         parameters: multiplier);
             }
             return View();
+        }
+
+        private bool CourseExists(int id)
+        {
+            return _context.Courses.Any(e => e.CourseID == id);
         }
     }
 }

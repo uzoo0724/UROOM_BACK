@@ -37,11 +37,7 @@ namespace ContosoUniversity.Data
                 new Student { FirstMidName = "Nino",     LastName = "Olivetto",
                     EnrollmentDate = DateTime.Parse("2005-09-01") }
             };
-
-            foreach (Student s in students)
-            {
-                context.Students.Add(s);
-            }
+            context.Students.AddRange(students);
             context.SaveChanges();
 
             var instructors = new Instructor[]
@@ -58,10 +54,7 @@ namespace ContosoUniversity.Data
                     HireDate = DateTime.Parse("2004-02-12") }
             };
 
-            foreach (Instructor i in instructors)
-            {
-                context.Instructors.Add(i);
-            }
+            context.Instructors.AddRange(instructors);
             context.SaveChanges();
 
             var departments = new Department[]
@@ -80,10 +73,7 @@ namespace ContosoUniversity.Data
                     InstructorID  = instructors.Single( i => i.LastName == "Kapoor").ID }
             };
 
-            foreach (Department d in departments)
-            {
-                context.Departments.Add(d);
-            }
+            context.Departments.AddRange(departments);
             context.SaveChanges();
 
             var courses = new Course[]
@@ -130,10 +120,7 @@ namespace ContosoUniversity.Data
                     Location = "Thompson 304" },
             };
 
-            foreach (OfficeAssignment o in officeAssignments)
-            {
-                context.OfficeAssignments.Add(o);
-            }
+            context.OfficeAssignments.AddRange(officeAssignments);
             context.SaveChanges();
 
             var courseInstructors = new CourseAssignment[]
@@ -172,10 +159,7 @@ namespace ContosoUniversity.Data
                     },
             };
 
-            foreach (CourseAssignment ci in courseInstructors)
-            {
-                context.CourseAssignments.Add(ci);
-            }
+            context.CourseAssignments.AddRange(courseInstructors);
             context.SaveChanges();
 
             var enrollments = new Enrollment[]

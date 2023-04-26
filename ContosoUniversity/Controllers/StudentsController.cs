@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 
-namespace ContosoUniversity
+namespace ContosoUniversity.Controllers
 {
     public class StudentsController : Controller
     {
@@ -28,8 +28,8 @@ namespace ContosoUniversity
             )
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "LastName_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "EnrollmentDate" ? "EnrollmentDate_desc" : "EnrollmentDate";
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
 
             if(searchString != null)
             {
@@ -50,7 +50,7 @@ namespace ContosoUniversity
                 students = students.Where(s => s.LastName.Contains(searchString)
                                        || s.FirstMidName.Contains(searchString));
             }
-
+            /*
             if (string.IsNullOrEmpty(sortOrder))
             {
                 sortOrder = "LastName";
@@ -62,7 +62,7 @@ namespace ContosoUniversity
                 sortOrder = sortOrder.Substring(0, sortOrder.Length - 5);
                 descending = true;
             }
-
+            
             if (descending)
             {
                 students = students.OrderByDescending(e => EF.Property<object>(e, sortOrder));
@@ -70,12 +70,8 @@ namespace ContosoUniversity
             else
             {
                 students = students.OrderBy(e => EF.Property<object>(e, sortOrder));
-            }
+            }*/
 
-            int pageSize = 3;
-            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(),
-                pageNumber ?? 1, pageSize));
-            /*
             switch (sortOrder)
             {
                 case "name_desc":
@@ -91,6 +87,12 @@ namespace ContosoUniversity
                     students = students.OrderBy(s => s.LastName);
                     break;
             }
+
+            int pageSize = 3;
+            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(),
+                pageNumber ?? 1, pageSize));
+            /*
+            
 
             int pageSize = 3;
 
@@ -154,9 +156,25 @@ namespace ContosoUniversity
         }
 
         // GET: Students/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            return View(student);
+        }
+
+        // GET: Students/Edit/5
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> EditPost(int? id)
         {
             if (id == null)
             {
@@ -185,40 +203,6 @@ namespace ContosoUniversity
             return View(studentToUpdate);
         }
 
-        // POST: Students/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,LastName,FirstMidName,EnrollmentDate")] Student student)
-        {
-            if (id != student.ID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(student);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StudentExists(student.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(student);
-        }
 
         // GET: Students/Delete/5
         public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
@@ -272,7 +256,7 @@ namespace ContosoUniversity
 
         private bool StudentExists(int id)
         {
-          return (_context.Students?.Any(e => e.ID == id)).GetValueOrDefault();
+            return _context.Students.Any(e => e.ID == id);
         }
     }
 }
